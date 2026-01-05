@@ -180,11 +180,11 @@ const HelixStructure = () => {
 
 const Scene3D = () => {
   return (
-    <div className="fixed inset-0 -z-10">
+    <div className="fixed top-0 left-0 w-full h-full -z-10" style={{ width: '100vw', height: '100vh' }}>
       {/* Gradient fallback background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#030014] via-[#0a0520] to-[#030014]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyan-900/20 via-transparent to-transparent" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-purple-900/20 via-transparent to-transparent" />
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#030014] via-[#0a0520] to-[#030014]" />
+      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyan-900/20 via-transparent to-transparent" />
+      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-purple-900/20 via-transparent to-transparent" />
       
       <ScrollTracker />
       
@@ -192,7 +192,14 @@ const Scene3D = () => {
         <Canvas 
           camera={{ position: [0, 0, 10], fov: 60 }}
           gl={{ antialias: true, alpha: true }}
-          style={{ background: 'transparent' }}
+          style={{ 
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            background: 'transparent' 
+          }}
         >
           <ambientLight intensity={0.4} />
           <pointLight position={[-10, 10, 10]} intensity={1.5} color="#00ffff" />
