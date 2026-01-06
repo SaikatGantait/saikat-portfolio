@@ -1,5 +1,4 @@
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, MeshDistortMaterial, Stars } from "@react-three/drei";
 import { useRef, useMemo, useEffect } from "react";
 import * as THREE from "three";
 import { Suspense } from "react";
@@ -20,114 +19,198 @@ const ScrollTracker = () => {
   return null;
 };
 
-const AnimatedSphere = ({ 
-  position, 
-  color, 
-  size = 1,
-  scrollOffset = 0
-}: { 
-  position: [number, number, number]; 
-  color: string; 
-  size?: number;
-  scrollOffset?: number;
-}) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const startPos = useMemo(() => [...position] as [number, number, number], [position]);
+// Glowing grid plane
+const TechGrid = () => {
+  const gridRef = useRef<THREE.GridHelper>(null);
   
   useFrame((state) => {
-    if (meshRef.current) {
-      const time = state.clock.elapsedTime;
-      const scroll = scrollProgress;
-      
-      // Floating animation + scroll-based movement
-      meshRef.current.position.x = startPos[0] + Math.sin(time * 0.5 + scrollOffset) * 0.5 + scroll * 2 * Math.sin(scrollOffset);
-      meshRef.current.position.y = startPos[1] + Math.cos(time * 0.3 + scrollOffset) * 0.5 + scroll * 3 * Math.cos(scrollOffset);
-      meshRef.current.position.z = startPos[2] + scroll * -5;
-      
-      // Rotation based on scroll
-      meshRef.current.rotation.x = time * 0.2 + scroll * Math.PI * 2;
-      meshRef.current.rotation.y = time * 0.3 + scroll * Math.PI;
-      
-      // Scale pulse
-      const scale = size * (1 + Math.sin(time + scrollOffset) * 0.1 + scroll * 0.3);
-      meshRef.current.scale.setScalar(scale);
+    if (gridRef.current) {
+      gridRef.current.position.z = -scrollProgress * 10;
+      gridRef.current.rotation.x = Math.PI / 2 + scrollProgress * 0.3;
     }
   });
 
   return (
-    <mesh ref={meshRef} position={position}>
-      <sphereGeometry args={[1, 32, 32]} />
-      <MeshDistortMaterial
-        color={color}
-        distort={0.4}
-        speed={2}
-        roughness={0.2}
-        metalness={0.8}
-      />
-    </mesh>
+    <gridHelper 
+      ref={gridRef}
+      args={[40, 40, "#00ffff", "#0a1628"]} 
+      position={[0, -5, -10]}
+      rotation={[Math.PI / 2, 0, 0]}
+    />
   );
 };
 
-const ScrollRings = () => {
-  const groupRef = useRef<THREE.Group>(null);
+// Floating tech cubes
+const FloatingCube = ({ 
+  position, 
+  size = 1,
+  rotationSpeed = 1,
+  color = "#00ffff"
+}: { 
+  position: [number, number, number]; 
+  size?: number;
+  rotationSpeed?: number;
+  color?: string;
+}) => {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const edgesRef = useRef<THREE.LineSegments>(null);
+  const initialPos = useMemo(() => [...position] as [number, number, number], [position]);
   
   useFrame((state) => {
-    if (groupRef.current) {
+    if (meshRef.current && edgesRef.current) {
+      const time = state.clock.elapsedTime;
       const scroll = scrollProgress;
-      groupRef.current.rotation.x = scroll * Math.PI * 2;
-      groupRef.current.rotation.y = state.clock.elapsedTime * 0.1 + scroll * Math.PI;
       
-      groupRef.current.children.forEach((child, i) => {
-        const scale = 1 + scroll * (i + 1) * 0.4;
-        child.scale.setScalar(scale);
-      });
+      // Floating motion
+      meshRef.current.position.y = initialPos[1] + Math.sin(time * 0.5) * 0.5;
+      meshRef.current.position.z = initialPos[2] - scroll * 8;
+      
+      // Rotation
+      meshRef.current.rotation.x = time * 0.2 * rotationSpeed + scroll * Math.PI;
+      meshRef.current.rotation.y = time * 0.3 * rotationSpeed;
+      
+      // Sync edges
+      edgesRef.current.position.copy(meshRef.current.position);
+      edgesRef.current.rotation.copy(meshRef.current.rotation);
     }
   });
 
-  const colors = ["#00ffff", "#ff00ff", "#8b5cf6", "#06b6d4"];
+  const geometry = useMemo(() => new THREE.BoxGeometry(size, size, size), [size]);
+  const edges = useMemo(() => new THREE.EdgesGeometry(geometry), [geometry]);
+
+  return (
+    <>
+      <mesh ref={meshRef} position={position} geometry={geometry}>
+        <meshBasicMaterial color={color} transparent opacity={0.1} />
+      </mesh>
+      <lineSegments ref={edgesRef} position={position} geometry={edges}>
+        <lineBasicMaterial color={color} transparent opacity={0.8} />
+      </lineSegments>
+    </>
+  );
+};
+
+// Neural network nodes with connections
+const NeuralNetwork = () => {
+  const groupRef = useRef<THREE.Group>(null);
+  
+  const nodes = useMemo(() => {
+    const points: [number, number, number][] = [];
+    for (let i = 0; i < 20; i++) {
+      points.push([
+        (Math.random() - 0.5) * 15,
+        (Math.random() - 0.5) * 10,
+        (Math.random() - 0.5) * 10 - 5
+      ]);
+    }
+    return points;
+  }, []);
+
+  const connections = useMemo(() => {
+    const lines: THREE.Vector3[][] = [];
+    nodes.forEach((node, i) => {
+      // Connect to 2-3 nearby nodes
+      const nearby = nodes
+        .map((n, j) => ({ node: n, index: j, dist: Math.hypot(n[0] - node[0], n[1] - node[1], n[2] - node[2]) }))
+        .filter(n => n.index !== i && n.dist < 6)
+        .slice(0, 3);
+      
+      nearby.forEach(n => {
+        if (n.index > i) {
+          lines.push([
+            new THREE.Vector3(...node),
+            new THREE.Vector3(...n.node)
+          ]);
+        }
+      });
+    });
+    return lines;
+  }, [nodes]);
+
+  useFrame((state) => {
+    if (groupRef.current) {
+      groupRef.current.rotation.y = state.clock.elapsedTime * 0.05 + scrollProgress * Math.PI * 0.5;
+      groupRef.current.position.z = -scrollProgress * 5;
+    }
+  });
 
   return (
     <group ref={groupRef}>
-      {colors.map((color, i) => (
-        <mesh key={i} rotation={[Math.PI / 2, 0, (i * Math.PI) / 4]}>
-          <torusGeometry args={[1.5 + i * 0.4, 0.03, 16, 64]} />
-          <meshBasicMaterial color={color} transparent opacity={0.7} />
+      {/* Nodes */}
+      {nodes.map((pos, i) => (
+        <mesh key={i} position={pos}>
+          <sphereGeometry args={[0.08, 16, 16]} />
+          <meshBasicMaterial color={i % 3 === 0 ? "#00ffff" : i % 3 === 1 ? "#8b5cf6" : "#06b6d4"} />
         </mesh>
+      ))}
+      
+      {/* Connections */}
+      {connections.map((points, i) => (
+        <line key={`line-${i}`}>
+          <bufferGeometry>
+            <bufferAttribute
+              attach="attributes-position"
+              count={2}
+              array={new Float32Array([...points[0].toArray(), ...points[1].toArray()])}
+              itemSize={3}
+            />
+          </bufferGeometry>
+          <lineBasicMaterial color="#00ffff" transparent opacity={0.3} />
+        </line>
       ))}
     </group>
   );
 };
 
-const FloatingParticles = () => {
-  const pointsRef = useRef<THREE.Points>(null);
-  const count = 300;
+// Orbiting ring
+const OrbitRing = ({ radius, color, speed }: { radius: number; color: string; speed: number }) => {
+  const ringRef = useRef<THREE.Mesh>(null);
   
-  const [positions, colors] = useMemo(() => {
-    const pos = new Float32Array(count * 3);
-    const col = new Float32Array(count * 3);
-    const colorOptions = [
-      new THREE.Color("#00ffff"),
-      new THREE.Color("#ff00ff"),
-      new THREE.Color("#8b5cf6"),
-    ];
-    
-    for (let i = 0; i < count; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 25;
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 25;
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 25;
-      
-      const c = colorOptions[Math.floor(Math.random() * colorOptions.length)];
-      col[i * 3] = c.r;
-      col[i * 3 + 1] = c.g;
-      col[i * 3 + 2] = c.b;
+  useFrame((state) => {
+    if (ringRef.current) {
+      ringRef.current.rotation.x = state.clock.elapsedTime * speed + scrollProgress * Math.PI;
+      ringRef.current.rotation.z = state.clock.elapsedTime * speed * 0.5;
     }
-    return [pos, col];
+  });
+
+  return (
+    <mesh ref={ringRef}>
+      <torusGeometry args={[radius, 0.02, 16, 100]} />
+      <meshBasicMaterial color={color} transparent opacity={0.6} />
+    </mesh>
+  );
+};
+
+// Data particles flowing
+const DataParticles = () => {
+  const pointsRef = useRef<THREE.Points>(null);
+  const count = 100;
+  
+  const positions = useMemo(() => {
+    const pos = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      const theta = Math.random() * Math.PI * 2;
+      const radius = 3 + Math.random() * 8;
+      pos[i * 3] = Math.cos(theta) * radius;
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 15;
+      pos[i * 3 + 2] = Math.sin(theta) * radius - 5;
+    }
+    return pos;
   }, []);
 
   useFrame((state) => {
     if (pointsRef.current) {
-      pointsRef.current.rotation.y = state.clock.elapsedTime * 0.05 + scrollProgress * Math.PI;
-      pointsRef.current.rotation.x = scrollProgress * 0.5;
+      const positions = pointsRef.current.geometry.attributes.position.array as Float32Array;
+      const time = state.clock.elapsedTime;
+      
+      for (let i = 0; i < count; i++) {
+        positions[i * 3 + 1] += 0.02;
+        if (positions[i * 3 + 1] > 8) {
+          positions[i * 3 + 1] = -8;
+        }
+      }
+      pointsRef.current.geometry.attributes.position.needsUpdate = true;
+      pointsRef.current.rotation.y = time * 0.1 + scrollProgress * Math.PI;
     }
   });
 
@@ -135,95 +218,46 @@ const FloatingParticles = () => {
     <points ref={pointsRef}>
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
-        <bufferAttribute attach="attributes-color" count={count} array={colors} itemSize={3} />
       </bufferGeometry>
-      <pointsMaterial size={0.08} vertexColors transparent opacity={0.8} sizeAttenuation />
+      <pointsMaterial size={0.05} color="#00ffff" transparent opacity={0.8} sizeAttenuation />
     </points>
-  );
-};
-
-const HelixStructure = () => {
-  const groupRef = useRef<THREE.Group>(null);
-  const count = 30;
-  
-  useFrame((state) => {
-    if (groupRef.current) {
-      const scroll = scrollProgress;
-      groupRef.current.rotation.y = state.clock.elapsedTime * 0.2 + scroll * Math.PI * 3;
-      
-      groupRef.current.children.forEach((child, i) => {
-        const mesh = child as THREE.Mesh;
-        const phase = (i / count) * Math.PI * 4 + scroll * Math.PI * 6;
-        const radius = 2 + scroll * 1.5;
-        mesh.position.x = Math.cos(phase) * radius;
-        mesh.position.z = Math.sin(phase) * radius;
-        mesh.position.y = (i - count / 2) * 0.35;
-      });
-    }
-  });
-
-  return (
-    <group ref={groupRef} position={[0, 0, -3]}>
-      {Array.from({ length: count }).map((_, i) => (
-        <mesh key={i}>
-          <sphereGeometry args={[0.12, 16, 16]} />
-          <meshStandardMaterial 
-            color={i % 2 === 0 ? "#00ffff" : "#ff00ff"} 
-            emissive={i % 2 === 0 ? "#00ffff" : "#ff00ff"}
-            emissiveIntensity={0.5}
-          />
-        </mesh>
-      ))}
-    </group>
   );
 };
 
 const Scene3D = () => {
   return (
-    <div className="fixed top-0 left-0 w-full h-full -z-10" style={{ width: '100vw', height: '100vh' }}>
-      {/* Gradient fallback background */}
-      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#030014] via-[#0a0520] to-[#030014]" />
-      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyan-900/20 via-transparent to-transparent" />
-      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-purple-900/20 via-transparent to-transparent" />
+    <div className="fixed inset-0 -z-10">
+      {/* Dark tech gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#030014] via-[#0a0a1f] to-[#030014]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-cyan-900/10 via-transparent to-transparent" />
       
       <ScrollTracker />
       
       <Suspense fallback={null}>
         <Canvas 
-          camera={{ position: [0, 0, 10], fov: 60 }}
+          camera={{ position: [0, 0, 12], fov: 60 }}
           gl={{ antialias: true, alpha: true }}
-          style={{ 
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            background: 'transparent' 
-          }}
+          style={{ position: 'absolute', inset: 0, background: 'transparent' }}
         >
-          <ambientLight intensity={0.4} />
-          <pointLight position={[-10, 10, 10]} intensity={1.5} color="#00ffff" />
-          <pointLight position={[10, -10, -10]} intensity={1.5} color="#ff00ff" />
-          <pointLight position={[0, 0, 10]} intensity={1} color="#8b5cf6" />
+          {/* Tech grid floor */}
+          <TechGrid />
           
-          {/* Animated spheres */}
-          <AnimatedSphere position={[-4, 2, -2]} color="#00ffff" size={1.2} scrollOffset={0} />
-          <AnimatedSphere position={[4, -1, -3]} color="#ff00ff" size={1} scrollOffset={Math.PI / 2} />
-          <AnimatedSphere position={[2, 3, -4]} color="#8b5cf6" size={0.8} scrollOffset={Math.PI} />
-          <AnimatedSphere position={[-3, -3, -3]} color="#06b6d4" size={0.9} scrollOffset={Math.PI * 1.5} />
-          <AnimatedSphere position={[0, -2, -5]} color="#f472b6" size={0.7} scrollOffset={Math.PI * 0.75} />
+          {/* Floating wireframe cubes */}
+          <FloatingCube position={[-5, 2, -3]} size={1.5} color="#00ffff" rotationSpeed={0.8} />
+          <FloatingCube position={[5, -1, -4]} size={1.2} color="#8b5cf6" rotationSpeed={1.2} />
+          <FloatingCube position={[3, 3, -6]} size={0.8} color="#06b6d4" rotationSpeed={1} />
+          <FloatingCube position={[-4, -2, -5]} size={1} color="#00ffff" rotationSpeed={0.6} />
           
-          {/* Scroll rings */}
-          <ScrollRings />
+          {/* Neural network */}
+          <NeuralNetwork />
           
-          {/* Helix structure */}
-          <HelixStructure />
+          {/* Orbit rings */}
+          <OrbitRing radius={4} color="#00ffff" speed={0.2} />
+          <OrbitRing radius={5} color="#8b5cf6" speed={-0.15} />
+          <OrbitRing radius={6} color="#06b6d4" speed={0.1} />
           
-          {/* Particles */}
-          <FloatingParticles />
-          
-          {/* Stars */}
-          <Stars radius={80} depth={50} count={1500} factor={4} saturation={0.5} fade speed={1} />
+          {/* Data particles */}
+          <DataParticles />
         </Canvas>
       </Suspense>
     </div>
