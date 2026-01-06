@@ -33,7 +33,7 @@ const TechGrid = () => {
   return (
     <gridHelper 
       ref={gridRef}
-      args={[40, 40, "#00ffff", "#0a1628"]} 
+      args={[40, 40, "#1a3a4a", "#0a1018"]} 
       position={[0, -5, -10]}
       rotation={[Math.PI / 2, 0, 0]}
     />
@@ -140,7 +140,7 @@ const NeuralNetwork = () => {
       {nodes.map((pos, i) => (
         <mesh key={i} position={pos}>
           <sphereGeometry args={[0.08, 16, 16]} />
-          <meshBasicMaterial color={i % 3 === 0 ? "#00ffff" : i % 3 === 1 ? "#8b5cf6" : "#06b6d4"} />
+          <meshBasicMaterial color={i % 3 === 0 ? "#2d5a6a" : i % 3 === 1 ? "#4a3a6a" : "#1a4a5a"} />
         </mesh>
       ))}
       
@@ -155,7 +155,7 @@ const NeuralNetwork = () => {
               itemSize={3}
             />
           </bufferGeometry>
-          <lineBasicMaterial color="#00ffff" transparent opacity={0.3} />
+          <lineBasicMaterial color="#1a4a5a" transparent opacity={0.2} />
         </line>
       ))}
     </group>
@@ -176,7 +176,7 @@ const OrbitRing = ({ radius, color, speed }: { radius: number; color: string; sp
   return (
     <mesh ref={ringRef}>
       <torusGeometry args={[radius, 0.02, 16, 100]} />
-      <meshBasicMaterial color={color} transparent opacity={0.6} />
+      <meshBasicMaterial color={color} transparent opacity={0.3} />
     </mesh>
   );
 };
@@ -219,7 +219,7 @@ const DataParticles = () => {
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
       </bufferGeometry>
-      <pointsMaterial size={0.05} color="#00ffff" transparent opacity={0.8} sizeAttenuation />
+      <pointsMaterial size={0.05} color="#2a4a5a" transparent opacity={0.5} sizeAttenuation />
     </points>
   );
 };
@@ -228,8 +228,8 @@ const Scene3D = () => {
   return (
     <div className="fixed inset-0 -z-10">
       {/* Dark tech gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#030014] via-[#0a0a1f] to-[#030014]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-cyan-900/10 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#020008] via-[#050510] to-[#020008]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-900/20 via-transparent to-transparent" />
       
       <ScrollTracker />
       
@@ -243,18 +243,18 @@ const Scene3D = () => {
           <TechGrid />
           
           {/* Floating wireframe cubes */}
-          <FloatingCube position={[-5, 2, -3]} size={1.5} color="#00ffff" rotationSpeed={0.8} />
-          <FloatingCube position={[5, -1, -4]} size={1.2} color="#8b5cf6" rotationSpeed={1.2} />
-          <FloatingCube position={[3, 3, -6]} size={0.8} color="#06b6d4" rotationSpeed={1} />
-          <FloatingCube position={[-4, -2, -5]} size={1} color="#00ffff" rotationSpeed={0.6} />
+          <FloatingCube position={[-5, 2, -3]} size={1.5} color="#2a4a5a" rotationSpeed={0.8} />
+          <FloatingCube position={[5, -1, -4]} size={1.2} color="#3a3a5a" rotationSpeed={1.2} />
+          <FloatingCube position={[3, 3, -6]} size={0.8} color="#1a3a4a" rotationSpeed={1} />
+          <FloatingCube position={[-4, -2, -5]} size={1} color="#2a4a5a" rotationSpeed={0.6} />
           
           {/* Neural network */}
           <NeuralNetwork />
           
           {/* Orbit rings */}
-          <OrbitRing radius={4} color="#00ffff" speed={0.2} />
-          <OrbitRing radius={5} color="#8b5cf6" speed={-0.15} />
-          <OrbitRing radius={6} color="#06b6d4" speed={0.1} />
+          <OrbitRing radius={4} color="#1a3a4a" speed={0.2} />
+          <OrbitRing radius={5} color="#2a2a4a" speed={-0.15} />
+          <OrbitRing radius={6} color="#1a4a5a" speed={0.1} />
           
           {/* Data particles */}
           <DataParticles />
