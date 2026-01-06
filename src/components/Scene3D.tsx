@@ -19,245 +19,149 @@ const ScrollTracker = () => {
   return null;
 };
 
-// Glowing grid plane
-const TechGrid = () => {
-  const gridRef = useRef<THREE.GridHelper>(null);
+// Flowing wave particles
+const WaveParticles = ({ count = 2000 }) => {
+  const mesh = useRef<THREE.Points>(null);
+  const time = useRef(0);
   
-  useFrame((state) => {
-    if (gridRef.current) {
-      gridRef.current.position.z = -scrollProgress * 10;
-      gridRef.current.rotation.x = Math.PI / 2 + scrollProgress * 0.3;
+  const { positions, originalPositions } = useMemo(() => {
+    const positions = new Float32Array(count * 3);
+    const originalPositions = new Float32Array(count * 3);
+    
+    for (let i = 0; i < count; i++) {
+      const x = (Math.random() - 0.5) * 35;
+      const z = (Math.random() - 0.5) * 25 - 8;
+      const y = (Math.random() - 0.5) * 20;
+      
+      positions[i * 3] = x;
+      positions[i * 3 + 1] = y;
+      positions[i * 3 + 2] = z;
+      
+      originalPositions[i * 3] = x;
+      originalPositions[i * 3 + 1] = y;
+      originalPositions[i * 3 + 2] = z;
     }
+    
+    return { positions, originalPositions };
+  }, [count]);
+
+  useFrame((_, delta) => {
+    if (!mesh.current) return;
+    time.current += delta * 0.4;
+    
+    const posArray = mesh.current.geometry.attributes.position.array as Float32Array;
+    
+    for (let i = 0; i < count; i++) {
+      const ox = originalPositions[i * 3];
+      const oy = originalPositions[i * 3 + 1];
+      const oz = originalPositions[i * 3 + 2];
+      
+      posArray[i * 3 + 1] = oy + Math.sin(ox * 0.2 + time.current) * 0.8 + Math.sin(oz * 0.15 + time.current * 0.6) * 0.5;
+      posArray[i * 3] = ox + Math.sin(time.current * 0.4 + oy * 0.08) * 0.3;
+    }
+    
+    mesh.current.geometry.attributes.position.needsUpdate = true;
+    mesh.current.rotation.y = scrollProgress * 0.4;
   });
 
   return (
-    <gridHelper 
-      ref={gridRef}
-      args={[40, 40, "#3d6a7a", "#0a1520"]} 
-      position={[0, -5, -10]}
-      rotation={[Math.PI / 2, 0, 0]}
-    />
+    <points ref={mesh}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
+      </bufferGeometry>
+      <pointsMaterial size={0.035} color="#6366f1" transparent opacity={0.5} sizeAttenuation />
+    </points>
   );
 };
 
-// Floating tech cubes
-const FloatingCube = ({ 
-  position, 
-  size = 1,
-  rotationSpeed = 1,
-  color = "#00ffff"
-}: { 
+// Glowing orbs floating around
+const GlowingOrb = ({ position, size, color, speed }: { 
   position: [number, number, number]; 
-  size?: number;
-  rotationSpeed?: number;
-  color?: string;
+  size: number; 
+  color: string; 
+  speed: number 
 }) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const edgesRef = useRef<THREE.LineSegments>(null);
-  const initialPos = useMemo(() => [...position] as [number, number, number], [position]);
+  const mesh = useRef<THREE.Mesh>(null);
+  const time = useRef(Math.random() * 100);
   
-  useFrame((state) => {
-    if (meshRef.current && edgesRef.current) {
-      const time = state.clock.elapsedTime;
-      const scroll = scrollProgress;
-      
-      // Floating motion
-      meshRef.current.position.y = initialPos[1] + Math.sin(time * 0.5) * 0.5;
-      meshRef.current.position.z = initialPos[2] - scroll * 8;
-      
-      // Rotation
-      meshRef.current.rotation.x = time * 0.2 * rotationSpeed + scroll * Math.PI;
-      meshRef.current.rotation.y = time * 0.3 * rotationSpeed;
-      
-      // Sync edges
-      edgesRef.current.position.copy(meshRef.current.position);
-      edgesRef.current.rotation.copy(meshRef.current.rotation);
-    }
-  });
-
-  const geometry = useMemo(() => new THREE.BoxGeometry(size, size, size), [size]);
-  const edges = useMemo(() => new THREE.EdgesGeometry(geometry), [geometry]);
-
-  return (
-    <>
-      <mesh ref={meshRef} position={position} geometry={geometry}>
-        <meshBasicMaterial color={color} transparent opacity={0.1} />
-      </mesh>
-      <lineSegments ref={edgesRef} position={position} geometry={edges}>
-        <lineBasicMaterial color={color} transparent opacity={0.8} />
-      </lineSegments>
-    </>
-  );
-};
-
-// Neural network nodes with connections
-const NeuralNetwork = () => {
-  const groupRef = useRef<THREE.Group>(null);
-  
-  const nodes = useMemo(() => {
-    const points: [number, number, number][] = [];
-    for (let i = 0; i < 20; i++) {
-      points.push([
-        (Math.random() - 0.5) * 15,
-        (Math.random() - 0.5) * 10,
-        (Math.random() - 0.5) * 10 - 5
-      ]);
-    }
-    return points;
-  }, []);
-
-  const connections = useMemo(() => {
-    const lines: THREE.Vector3[][] = [];
-    nodes.forEach((node, i) => {
-      // Connect to 2-3 nearby nodes
-      const nearby = nodes
-        .map((n, j) => ({ node: n, index: j, dist: Math.hypot(n[0] - node[0], n[1] - node[1], n[2] - node[2]) }))
-        .filter(n => n.index !== i && n.dist < 6)
-        .slice(0, 3);
-      
-      nearby.forEach(n => {
-        if (n.index > i) {
-          lines.push([
-            new THREE.Vector3(...node),
-            new THREE.Vector3(...n.node)
-          ]);
-        }
-      });
-    });
-    return lines;
-  }, [nodes]);
-
-  useFrame((state) => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y = state.clock.elapsedTime * 0.05 + scrollProgress * Math.PI * 0.5;
-      groupRef.current.position.z = -scrollProgress * 5;
-    }
+  useFrame((_, delta) => {
+    if (!mesh.current) return;
+    time.current += delta * speed;
+    
+    mesh.current.position.y = position[1] + Math.sin(time.current) * 1;
+    mesh.current.position.x = position[0] + Math.cos(time.current * 0.6) * 0.6;
+    mesh.current.scale.setScalar(size + Math.sin(time.current * 1.5) * 0.15);
   });
 
   return (
-    <group ref={groupRef}>
-      {/* Nodes */}
-      {nodes.map((pos, i) => (
-        <mesh key={i} position={pos}>
-          <sphereGeometry args={[0.08, 16, 16]} />
-          <meshBasicMaterial color={i % 3 === 0 ? "#4d8a9a" : i % 3 === 1 ? "#6a5a8a" : "#3a7a8a"} />
-        </mesh>
-      ))}
-      
-      {/* Connections */}
-      {connections.map((points, i) => (
-        <line key={`line-${i}`}>
-          <bufferGeometry>
-            <bufferAttribute
-              attach="attributes-position"
-              count={2}
-              array={new Float32Array([...points[0].toArray(), ...points[1].toArray()])}
-              itemSize={3}
-            />
-          </bufferGeometry>
-          <lineBasicMaterial color="#3a6a7a" transparent opacity={0.35} />
-        </line>
-      ))}
-    </group>
-  );
-};
-
-// Orbiting ring
-const OrbitRing = ({ radius, color, speed }: { radius: number; color: string; speed: number }) => {
-  const ringRef = useRef<THREE.Mesh>(null);
-  
-  useFrame((state) => {
-    if (ringRef.current) {
-      ringRef.current.rotation.x = state.clock.elapsedTime * speed + scrollProgress * Math.PI;
-      ringRef.current.rotation.z = state.clock.elapsedTime * speed * 0.5;
-    }
-  });
-
-  return (
-    <mesh ref={ringRef}>
-      <torusGeometry args={[radius, 0.02, 16, 100]} />
-      <meshBasicMaterial color={color} transparent opacity={0.5} />
+    <mesh ref={mesh} position={position}>
+      <sphereGeometry args={[size, 32, 32]} />
+      <meshBasicMaterial color={color} transparent opacity={0.12} />
     </mesh>
   );
 };
 
-// Data particles flowing
-const DataParticles = () => {
-  const pointsRef = useRef<THREE.Points>(null);
-  const count = 100;
+// Floating geometric shapes
+const FloatingShape = ({ position, type, color, rotationSpeed }: { 
+  position: [number, number, number]; 
+  type: 'icosahedron' | 'octahedron' | 'dodecahedron';
+  color: string;
+  rotationSpeed: number;
+}) => {
+  const mesh = useRef<THREE.Mesh>(null);
+  const time = useRef(Math.random() * 100);
   
-  const positions = useMemo(() => {
-    const pos = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      const theta = Math.random() * Math.PI * 2;
-      const radius = 3 + Math.random() * 8;
-      pos[i * 3] = Math.cos(theta) * radius;
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 15;
-      pos[i * 3 + 2] = Math.sin(theta) * radius - 5;
-    }
-    return pos;
-  }, []);
-
-  useFrame((state) => {
-    if (pointsRef.current) {
-      const positions = pointsRef.current.geometry.attributes.position.array as Float32Array;
-      const time = state.clock.elapsedTime;
-      
-      for (let i = 0; i < count; i++) {
-        positions[i * 3 + 1] += 0.02;
-        if (positions[i * 3 + 1] > 8) {
-          positions[i * 3 + 1] = -8;
-        }
-      }
-      pointsRef.current.geometry.attributes.position.needsUpdate = true;
-      pointsRef.current.rotation.y = time * 0.1 + scrollProgress * Math.PI;
-    }
+  useFrame((_, delta) => {
+    if (!mesh.current) return;
+    time.current += delta;
+    
+    mesh.current.rotation.x += delta * rotationSpeed * 0.25;
+    mesh.current.rotation.y += delta * rotationSpeed * 0.15;
+    mesh.current.position.y = position[1] + Math.sin(time.current * 0.4) * 0.6;
   });
 
   return (
-    <points ref={pointsRef}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
-      </bufferGeometry>
-      <pointsMaterial size={0.06} color="#4a7a8a" transparent opacity={0.7} sizeAttenuation />
-    </points>
+    <mesh ref={mesh} position={position}>
+      {type === 'icosahedron' && <icosahedronGeometry args={[0.6, 0]} />}
+      {type === 'octahedron' && <octahedronGeometry args={[0.5, 0]} />}
+      {type === 'dodecahedron' && <dodecahedronGeometry args={[0.4, 0]} />}
+      <meshBasicMaterial color={color} wireframe transparent opacity={0.35} />
+    </mesh>
   );
 };
 
 const Scene3D = () => {
   return (
     <div className="fixed inset-0 -z-10">
-      {/* Dark tech gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#020008] via-[#050510] to-[#020008]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-900/20 via-transparent to-transparent" />
+      {/* Dark gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#05050a] via-[#0a0a12] to-[#05050a]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.06)_0%,transparent_60%)]" />
       
       <ScrollTracker />
       
       <Suspense fallback={null}>
         <Canvas 
-          camera={{ position: [0, 0, 12], fov: 60 }}
+          camera={{ position: [0, 0, 10], fov: 60 }}
           gl={{ antialias: true, alpha: true }}
           style={{ position: 'absolute', inset: 0, background: 'transparent' }}
         >
-          {/* Tech grid floor */}
-          <TechGrid />
+          {/* Wave particles */}
+          <WaveParticles count={2000} />
           
-          {/* Floating wireframe cubes */}
-          <FloatingCube position={[-5, 2, -3]} size={1.5} color="#4a7a8a" rotationSpeed={0.8} />
-          <FloatingCube position={[5, -1, -4]} size={1.2} color="#5a5a7a" rotationSpeed={1.2} />
-          <FloatingCube position={[3, 3, -6]} size={0.8} color="#3a6a7a" rotationSpeed={1} />
-          <FloatingCube position={[-4, -2, -5]} size={1} color="#4a7a8a" rotationSpeed={0.6} />
+          {/* Glowing orbs */}
+          <GlowingOrb position={[-7, 2, -6]} size={2} color="#6366f1" speed={0.4} />
+          <GlowingOrb position={[6, -1, -7]} size={2.5} color="#8b5cf6" speed={0.35} />
+          <GlowingOrb position={[0, 4, -10]} size={3} color="#a855f7" speed={0.25} />
+          <GlowingOrb position={[-5, -3, -5]} size={1.5} color="#6366f1" speed={0.5} />
+          <GlowingOrb position={[8, 3, -8]} size={1.8} color="#8b5cf6" speed={0.45} />
           
-          {/* Neural network */}
-          <NeuralNetwork />
-          
-          {/* Orbit rings */}
-          <OrbitRing radius={4} color="#3a6a7a" speed={0.2} />
-          <OrbitRing radius={5} color="#4a4a6a" speed={-0.15} />
-          <OrbitRing radius={6} color="#3a7a8a" speed={0.1} />
-          
-          {/* Data particles */}
-          <DataParticles />
+          {/* Floating shapes */}
+          <FloatingShape position={[-6, 1, -4]} type="icosahedron" color="#6366f1" rotationSpeed={0.6} />
+          <FloatingShape position={[5, 2, -5]} type="octahedron" color="#8b5cf6" rotationSpeed={0.8} />
+          <FloatingShape position={[7, -2, -6]} type="dodecahedron" color="#a855f7" rotationSpeed={0.5} />
+          <FloatingShape position={[-4, -2, -7]} type="octahedron" color="#6366f1" rotationSpeed={0.7} />
+          <FloatingShape position={[2, 5, -8]} type="icosahedron" color="#8b5cf6" rotationSpeed={0.55} />
+          <FloatingShape position={[-8, 0, -6]} type="dodecahedron" color="#a855f7" rotationSpeed={0.65} />
         </Canvas>
       </Suspense>
     </div>
