@@ -21,7 +21,7 @@ const StarField = ({ count = 1500 }) => {
       positions[i * 3 + 1] = Math.sin(angle) * radius;
       positions[i * 3 + 2] = Math.random() * 100 - 50;
       
-      velocities[i] = Math.random() * 0.5 + 0.3;
+      velocities[i] = Math.random() * 0.15 + 0.08;
       sizes[i] = Math.random() * 2 + 0.5;
     }
     
@@ -35,7 +35,7 @@ const StarField = ({ count = 1500 }) => {
     
     for (let i = 0; i < count; i++) {
       // Move stars toward camera (positive Z)
-      posArray[i * 3 + 2] += velocities[i] * 0.8;
+      posArray[i * 3 + 2] += velocities[i] * 0.5;
       
       // Reset star when it passes the camera
       if (posArray[i * 3 + 2] > 50) {
@@ -80,7 +80,7 @@ const StreakLines = ({ count = 200 }) => {
         y: Math.sin(angle) * radius,
         z: Math.random() * 100 - 50,
         length: Math.random() * 2 + 0.5,
-        speed: Math.random() * 0.6 + 0.4,
+        speed: Math.random() * 0.15 + 0.1,
       };
     });
   }, [count]);
@@ -90,7 +90,7 @@ const StreakLines = ({ count = 200 }) => {
     
     linesRef.current.children.forEach((line, i) => {
       const streak = streaks[i];
-      line.position.z += streak.speed * 0.8;
+      line.position.z += streak.speed * 0.5;
       
       if (line.position.z > 50) {
         const angle = Math.random() * Math.PI * 2;
