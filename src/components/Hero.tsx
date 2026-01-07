@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-import { Github, Linkedin, Twitter, ChevronDown } from "lucide-react";
+import { Github, Linkedin, Twitter, ChevronDown, Download } from "lucide-react";
 import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 
 const useTypingEffect = (text: string, speed: number = 100) => {
   const [displayedText, setDisplayedText] = useState("");
@@ -118,19 +119,34 @@ const Hero = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
-          className="flex items-center justify-center gap-4"
+          className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          {socialLinks.map((social) => (
-            <a
-              key={social.label}
-              href={social.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-3 rounded-full bg-white/5 border border-white/10 hover:bg-cyan-500/20 hover:border-cyan-500/50 transition-all duration-300 group"
-            >
-              <social.icon className="w-5 h-5 text-gray-400 group-hover:text-cyan-400 transition-colors" />
-            </a>
-          ))}
+          {/* Resume Download Button */}
+          <a
+            href="/resume.pdf"
+            download="Saikat_Gantait_Resume.pdf"
+            className="group"
+          >
+            <Button className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 text-white font-semibold px-6 py-3 rounded-full shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all duration-300">
+              <Download className="w-4 h-4 mr-2 group-hover:animate-bounce" />
+              Download Resume
+            </Button>
+          </a>
+
+          {/* Social Links */}
+          <div className="flex items-center gap-3">
+            {socialLinks.map((social) => (
+              <a
+                key={social.label}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 rounded-full bg-white/5 border border-white/10 hover:bg-cyan-500/20 hover:border-cyan-500/50 transition-all duration-300 group"
+              >
+                <social.icon className="w-5 h-5 text-gray-400 group-hover:text-cyan-400 transition-colors" />
+              </a>
+            ))}
+          </div>
         </motion.div>
       </motion.div>
 
