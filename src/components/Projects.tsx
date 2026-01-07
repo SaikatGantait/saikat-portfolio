@@ -59,6 +59,8 @@ const projects = [
   },
 ];
 
+// Get all unique tech tags
+const allTechs = ["All", ...new Set(projects.flatMap((p) => p.tech))];
 const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: number }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [rotateX, setRotateX] = useState(0);
@@ -160,6 +162,12 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
 };
 
 const Projects = () => {
+  const [activeFilter, setActiveFilter] = useState("All");
+
+  const filteredProjects = activeFilter === "All"
+    ? projects
+    : projects.filter((p) => p.tech.includes(activeFilter));
+
   return (
     <section className="py-24 px-6 relative" id="projects">
       {/* Background glow effects */}
@@ -171,7 +179,7 @@ const Projects = () => {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
           <motion.span 
             initial={{ opacity: 0, scale: 0.5 }}
@@ -192,11 +200,36 @@ const Projects = () => {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {projects.map((project, index) => (
+        {/* Filter Buttons */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="flex flex-wrap justify-center gap-3 mb-12"
+        >
+          {allTechs.map((tech) => (
+            <button
+              key={tech}
+              onClick={() => setActiveFilter(tech)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                activeFilter === tech
+                  ? "bg-gradient-to-r from-cyan-500 to-purple-500 text-white shadow-lg shadow-cyan-500/25"
+                  : "bg-white/5 text-gray-400 border border-white/10 hover:border-white/30 hover:text-white"
+              }`}
+            >
+              {tech}
+            </button>
+          ))}
+        </motion.div>
+
+        <motion.div 
+          layout
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
+          {filteredProjects.map((project, index) => (
             <ProjectCard key={project.name} project={project} index={index} />
           ))}
-        </div>
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
