@@ -1,6 +1,7 @@
 import Scene3D from "@/components/Scene3D";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
+import About from "@/components/About";
 import Projects from "@/components/Projects";
 import Skills from "@/components/Skills";
 import Contact from "@/components/Contact";
@@ -13,6 +14,7 @@ const Index = () => {
       <div className="relative z-10">
         <Navbar />
         <Hero />
+        <About />
         <Projects />
         <Skills />
         <Contact />

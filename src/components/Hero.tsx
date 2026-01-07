@@ -1,7 +1,32 @@
 import { motion } from "framer-motion";
 import { Github, Linkedin, Twitter, ChevronDown } from "lucide-react";
+import { useState, useEffect } from "react";
+
+const useTypingEffect = (text: string, speed: number = 100) => {
+  const [displayedText, setDisplayedText] = useState("");
+  const [isComplete, setIsComplete] = useState(false);
+
+  useEffect(() => {
+    let index = 0;
+    const timer = setInterval(() => {
+      if (index < text.length) {
+        setDisplayedText(text.slice(0, index + 1));
+        index++;
+      } else {
+        setIsComplete(true);
+        clearInterval(timer);
+      }
+    }, speed);
+
+    return () => clearInterval(timer);
+  }, [text, speed]);
+
+  return { displayedText, isComplete };
+};
 
 const Hero = () => {
+  const { displayedText, isComplete } = useTypingEffect("SAIKAT GANTAIT", 120);
+  
   const socialLinks = [
     { icon: Github, href: "https://github.com/SaikatGantait", label: "GitHub" },
     { icon: Linkedin, href: "https://www.linkedin.com/in/saikat-gantait/", label: "LinkedIn" },
@@ -44,10 +69,19 @@ const Hero = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="text-5xl md:text-7xl font-bold mb-4"
+          className="text-5xl md:text-7xl font-bold mb-4 min-h-[1.2em]"
         >
           <span className="bg-gradient-to-r from-white via-cyan-200 to-purple-400 bg-clip-text text-transparent">
-            SAIKAT GANTAIT
+            {displayedText}
+            {!isComplete && (
+              <motion.span
+                animate={{ opacity: [1, 0] }}
+                transition={{ repeat: Infinity, duration: 0.5 }}
+                className="text-cyan-400"
+              >
+                |
+              </motion.span>
+            )}
           </span>
         </motion.h1>
 
