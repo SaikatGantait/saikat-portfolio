@@ -102,7 +102,7 @@ const Contact = () => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Button variant="outline" className="w-full border-white/20 text-white hover:bg-white/10 mt-3">
+                <Button variant="outline" className="w-full border-white/40 bg-white/10 text-white hover:bg-white/20 mt-3">
                   <Github className="w-4 h-4 mr-2" />
                   View GitHub Profile
                 </Button>
