@@ -102,4 +102,9 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Ensure dark mode is default */
+  html {
+    @apply dark;
+  }
 }
