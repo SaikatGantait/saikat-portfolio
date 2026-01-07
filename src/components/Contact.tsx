@@ -10,8 +10,9 @@ const Contact = () => {
   ];
 
   return (
-    <section className="py-20 px-6" id="contact">
-      <div className="max-w-4xl mx-auto">
+    <section className="py-20 px-6 relative" id="contact">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div className="max-w-4xl mx-auto relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
