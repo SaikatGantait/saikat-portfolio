@@ -9,14 +9,12 @@ import Testimonials from "@/components/Testimonials";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import LoadingScreen from "@/components/LoadingScreen";
-import AnimatedCursor from "@/components/AnimatedCursor";
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   return (
     <>
-      <AnimatedCursor />
       {isLoading && <LoadingScreen onLoadingComplete={() => setIsLoading(false)} />}
       <div className={`min-h-screen text-white overflow-x-hidden relative ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-500`}>
         <Scene3D />
