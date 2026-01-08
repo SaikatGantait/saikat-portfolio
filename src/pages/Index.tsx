@@ -12,6 +12,7 @@ import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import ScrollProgress from "@/components/ScrollProgress";
 import LoadingScreen from "@/components/LoadingScreen";
+import CommandPalette from "@/components/CommandPalette";
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -20,6 +21,7 @@ const Index = () => {
     <>
       {isLoading && <LoadingScreen onLoadingComplete={() => setIsLoading(false)} />}
       <ScrollProgress />
+      <CommandPalette />
       <div className={`min-h-screen text-white overflow-x-hidden relative ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-500`}>
         <Scene3D />
         <div className="relative z-10">
