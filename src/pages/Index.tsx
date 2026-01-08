@@ -3,6 +3,7 @@ import Scene3D from "@/components/Scene3D";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
+import Stats from "@/components/Stats";
 import Projects from "@/components/Projects";
 import Skills from "@/components/Skills";
 import Testimonials from "@/components/Testimonials";
@@ -24,6 +25,7 @@ const Index = () => {
           <Navbar />
           <Hero />
           <About />
+          <Stats />
           <Projects />
           <Skills />
           <Testimonials />
