@@ -8,6 +8,7 @@ import Skills from "@/components/Skills";
 import Testimonials from "@/components/Testimonials";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+import ScrollProgress from "@/components/ScrollProgress";
 import LoadingScreen from "@/components/LoadingScreen";
 
 const Index = () => {
@@ -16,6 +17,7 @@ const Index = () => {
   return (
     <>
       {isLoading && <LoadingScreen onLoadingComplete={() => setIsLoading(false)} />}
+      <ScrollProgress />
       <div className={`min-h-screen text-white overflow-x-hidden relative ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-500`}>
         <Scene3D />
         <div className="relative z-10">
