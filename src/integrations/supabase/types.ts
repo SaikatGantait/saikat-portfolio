@@ -41,6 +41,180 @@ export type Database = {
         }
         Relationships: []
       }
+      portfolio_projects: {
+        Row: {
+          created_at: string
+          description: string
+          display_order: number
+          github: string | null
+          gradient: string
+          id: string
+          image_url: string | null
+          is_featured: boolean
+          live_url: string | null
+          name: string
+          tech: string[]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          display_order?: number
+          github?: string | null
+          gradient?: string
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean
+          live_url?: string | null
+          name: string
+          tech: string[]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          display_order?: number
+          github?: string | null
+          gradient?: string
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean
+          live_url?: string | null
+          name?: string
+          tech?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      portfolio_skills: {
+        Row: {
+          color_from: string
+          color_to: string
+          created_at: string
+          display_order: number
+          id: string
+          level: number
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          color_from?: string
+          color_to?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          level: number
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          color_from?: string
+          color_to?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          level?: number
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      portfolio_stats: {
+        Row: {
+          created_at: string
+          display_order: number
+          icon_name: string
+          id: string
+          label: string
+          suffix: string | null
+          updated_at: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          icon_name: string
+          id?: string
+          label: string
+          suffix?: string | null
+          updated_at?: string
+          value: number
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          icon_name?: string
+          id?: string
+          label?: string
+          suffix?: string | null
+          updated_at?: string
+          value?: number
+        }
+        Relationships: []
+      }
+      portfolio_tech_stack: {
+        Row: {
+          category: string
+          created_at: string
+          display_order: number
+          id: string
+          technologies: string[]
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          technologies: string[]
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          technologies?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      portfolio_timeline: {
+        Row: {
+          created_at: string
+          description: string
+          display_order: number
+          event_type: string
+          icon_name: string
+          id: string
+          title: string
+          updated_at: string
+          year: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          display_order?: number
+          event_type: string
+          icon_name: string
+          id?: string
+          title: string
+          updated_at?: string
+          year: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          display_order?: number
+          event_type?: string
+          icon_name?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          year?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
