@@ -46,7 +46,7 @@ const Hero = () => {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-          className="mb-6"
+          className="mb-6 relative"
         >
           <div className="w-32 h-32 mx-auto rounded-full bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 p-1">
             <img
@@ -55,6 +55,22 @@ const Hero = () => {
               className="w-full h-full rounded-full object-cover"
             />
           </div>
+          
+          {/* Availability Badge */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.6, type: "spring", stiffness: 300 }}
+            className="absolute -bottom-2 left-1/2 -translate-x-1/2"
+          >
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 backdrop-blur-sm">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+              </span>
+              <span className="text-xs font-medium text-emerald-400">Open to work</span>
+            </div>
+          </motion.div>
         </motion.div>
 
         <motion.p
