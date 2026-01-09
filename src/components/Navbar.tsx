@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Menu, X, Sun, Moon } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
@@ -16,6 +16,29 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Close mobile menu on escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [isMobileMenuOpen]);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
+
   const navItems = [
     { label: "Home", href: "#" },
     { label: "About", href: "#about" },
@@ -31,13 +54,19 @@ const Navbar = () => {
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-black/80 backdrop-blur-lg border-b border-white/10" : ""
+        isScrolled ? "bg-background/80 backdrop-blur-lg border-b border-border" : ""
       }`}
+      role="navigation"
+      aria-label="Main navigation"
     >
       <div className="max-w-6xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          <a href="#" className="text-xl font-bold">
-            <span className="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
+          <a 
+            href="#" 
+            className="text-xl font-bold"
+            aria-label="Saikat Gantait - Home"
+          >
+            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               SG
             </span>
           </a>
@@ -48,67 +77,97 @@ const Navbar = () => {
               <a
                 key={item.label}
                 href={item.href}
-                className="text-gray-400 hover:text-white transition-colors relative group"
+                className="text-muted-foreground hover:text-foreground transition-colors relative group"
               >
                 {item.label}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-500 group-hover:w-full transition-all duration-300" />
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300" />
               </a>
             ))}
             
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300"
-              aria-label="Toggle theme"
+              className="p-2 rounded-full bg-white/5 border border-border hover:bg-white/10 transition-all duration-300"
+              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+              title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
             >
               {theme === "dark" ? (
-                <Sun className="w-5 h-5 text-yellow-400" />
+                <Sun className="w-5 h-5 text-yellow-400" aria-hidden="true" />
               ) : (
-                <Moon className="w-5 h-5 text-purple-400" />
+                <Moon className="w-5 h-5 text-secondary" aria-hidden="true" />
               )}
             </button>
           </div>
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 text-gray-400 hover:text-white"
+            className="md:hidden p-2 text-muted-foreground hover:text-foreground"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-menu"
           >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMobileMenuOpen ? (
+              <X className="w-6 h-6" aria-hidden="true" />
+            ) : (
+              <Menu className="w-6 h-6" aria-hidden="true" />
+            )}
           </button>
         </div>
 
         {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden mt-4 pb-4"
-          >
-            {navItems.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                className="block py-3 text-gray-400 hover:text-white transition-colors"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {item.label}
-              </a>
-            ))}
-            <button
-              onClick={toggleTheme}
-              className="mt-2 p-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300"
-              aria-label="Toggle theme"
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              id="mobile-menu"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+              className="md:hidden mt-4 pb-4"
             >
-              {theme === "dark" ? (
-                <Sun className="w-5 h-5 text-yellow-400" />
-              ) : (
-                <Moon className="w-5 h-5 text-purple-400" />
-              )}
-            </button>
-          </motion.div>
-        )}
+              <div className="flex flex-col space-y-1">
+                {navItems.map((item, index) => (
+                  <motion.a
+                    key={item.label}
+                    href={item.href}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="py-3 px-2 text-muted-foreground hover:text-foreground hover:bg-white/5 rounded-lg transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {item.label}
+                  </motion.a>
+                ))}
+              </div>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="flex items-center gap-4 mt-4 pt-4 border-t border-border"
+              >
+                <button
+                  onClick={toggleTheme}
+                  className="flex items-center gap-2 p-2 rounded-full bg-white/5 border border-border hover:bg-white/10 transition-all duration-300"
+                  aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+                >
+                  {theme === "dark" ? (
+                    <>
+                      <Sun className="w-5 h-5 text-yellow-400" aria-hidden="true" />
+                      <span className="text-sm text-muted-foreground">Light mode</span>
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="w-5 h-5 text-secondary" aria-hidden="true" />
+                      <span className="text-sm text-muted-foreground">Dark mode</span>
+                    </>
+                  )}
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.nav>
   );
