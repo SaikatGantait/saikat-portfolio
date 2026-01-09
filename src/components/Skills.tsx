@@ -1,22 +1,56 @@
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
-const skills = [
-  { name: "React", level: 95, color: "from-cyan-400 to-cyan-600" },
-  { name: "TypeScript", level: 90, color: "from-blue-400 to-blue-600" },
-  { name: "Node.js", level: 85, color: "from-green-400 to-green-600" },
-  { name: "AWS", level: 80, color: "from-orange-400 to-orange-600" },
-  { name: "Python", level: 75, color: "from-yellow-400 to-yellow-600" },
-  { name: "Java", level: 70, color: "from-red-400 to-red-600" },
-];
+interface Skill {
+  id: string;
+  name: string;
+  level: number;
+  color_from: string;
+  color_to: string;
+  display_order: number;
+}
 
-const techStack = [
-  { category: "Frontend", items: ["React", "TypeScript", "Tailwind CSS", "Framer Motion", "Next.js"] },
-  { category: "Backend", items: ["Node.js", "Express", "Python", "Java", "REST APIs"] },
-  { category: "Cloud & DevOps", items: ["AWS", "Docker", "CI/CD", "Git", "Linux"] },
-  { category: "Database", items: ["PostgreSQL", "MongoDB", "Redis", "Supabase"] },
-];
+interface TechStack {
+  id: string;
+  category: string;
+  technologies: string[];
+  display_order: number;
+}
 
 const Skills = () => {
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [techStack, setTechStack] = useState<TechStack[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const [skillsRes, techRes] = await Promise.all([
+        supabase.from('portfolio_skills').select('*').order('display_order'),
+        supabase.from('portfolio_tech_stack').select('*').order('display_order')
+      ]);
+      
+      if (skillsRes.data) setSkills(skillsRes.data);
+      if (techRes.data) setTechStack(techRes.data);
+      setLoading(false);
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-20 px-6" id="skills">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="h-12 w-64 bg-white/10 rounded mx-auto mb-4 animate-pulse" />
+            <div className="h-6 w-96 bg-white/10 rounded mx-auto animate-pulse" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-20 px-6" id="skills">
       <div className="max-w-6xl mx-auto">
@@ -27,11 +61,11 @@ const Skills = () => {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent">
               Skills & Technologies
             </span>
           </h2>
-          <p className="text-gray-400 max-w-lg mx-auto">
+          <p className="text-muted-foreground max-w-lg mx-auto">
             My technical arsenal for building modern, scalable applications.
           </p>
         </motion.div>
@@ -39,18 +73,18 @@ const Skills = () => {
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Skill Bars */}
           <div className="space-y-6">
-            <h3 className="text-xl font-semibold text-white mb-6">Core Competencies</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-6">Core Competencies</h3>
             {skills.map((skill, index) => (
               <motion.div
-                key={skill.name}
+                key={skill.id}
                 initial={{ opacity: 0, x: -50 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
                 <div className="flex justify-between mb-2">
-                  <span className="text-gray-300 font-medium">{skill.name}</span>
-                  <span className="text-gray-500 text-sm">{skill.level}%</span>
+                  <span className="text-foreground/80 font-medium">{skill.name}</span>
+                  <span className="text-muted-foreground text-sm">{skill.level}%</span>
                 </div>
                 <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                   <motion.div
@@ -58,7 +92,10 @@ const Skills = () => {
                     whileInView={{ width: `${skill.level}%` }}
                     viewport={{ once: true }}
                     transition={{ duration: 1, delay: index * 0.1 + 0.3, ease: "easeOut" }}
-                    className={`h-full rounded-full bg-gradient-to-r ${skill.color}`}
+                    className="h-full rounded-full"
+                    style={{
+                      background: `linear-gradient(to right, ${skill.color_from}, ${skill.color_to})`
+                    }}
                   />
                 </div>
               </motion.div>
@@ -67,23 +104,23 @@ const Skills = () => {
 
           {/* Tech Stack Grid */}
           <div className="space-y-6">
-            <h3 className="text-xl font-semibold text-white mb-6">Tech Stack</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-6">Tech Stack</h3>
             <div className="grid grid-cols-2 gap-4">
               {techStack.map((stack, index) => (
                 <motion.div
-                  key={stack.category}
+                  key={stack.id}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
                   className="p-4 rounded-xl bg-white/5 border border-white/10"
                 >
-                  <h4 className="text-cyan-400 font-semibold mb-3 text-sm">{stack.category}</h4>
+                  <h4 className="text-primary font-semibold mb-3 text-sm">{stack.category}</h4>
                   <div className="flex flex-wrap gap-2">
-                    {stack.items.map((item) => (
+                    {stack.technologies.map((item) => (
                       <span
                         key={item}
-                        className="px-2 py-1 text-xs rounded-md bg-white/5 text-gray-400"
+                        className="px-2 py-1 text-xs rounded-md bg-white/5 text-muted-foreground"
                       >
                         {item}
                       </span>
