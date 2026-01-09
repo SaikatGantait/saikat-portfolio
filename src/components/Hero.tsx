@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
-import { Github, Linkedin, Twitter, ChevronDown, Download } from "lucide-react";
+import { Github, Linkedin, Twitter, ChevronDown, FileText } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-
+import ResumeModal from "./ResumeModal";
 const useTypingEffect = (text: string, speed: number = 100) => {
   const [displayedText, setDisplayedText] = useState("");
   const [isComplete, setIsComplete] = useState(false);
@@ -27,6 +27,7 @@ const useTypingEffect = (text: string, speed: number = 100) => {
 
 const Hero = () => {
   const { displayedText, isComplete } = useTypingEffect("SAIKAT GANTAIT", 120);
+  const [isResumeOpen, setIsResumeOpen] = useState(false);
   
   const socialLinks = [
     { icon: Github, href: "https://github.com/SaikatGantait", label: "GitHub" },
@@ -35,19 +36,22 @@ const Hero = () => {
   ];
 
   return (
-    <section className="min-h-screen flex flex-col items-center justify-center relative px-6">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="text-center z-10"
-      >
+    <>
+      <ResumeModal isOpen={isResumeOpen} onClose={() => setIsResumeOpen(false)} />
+      
+      <section className="min-h-screen flex flex-col items-center justify-center relative px-6">
         <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-          className="mb-6 relative"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-center z-10"
         >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+            className="mb-6 relative"
+          >
           <div className="w-32 h-32 mx-auto rounded-full bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 p-1">
             <img
               src="https://avatars.githubusercontent.com/u/88987186?v=4"
@@ -137,17 +141,14 @@ const Hero = () => {
           transition={{ delay: 0.8 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          {/* Resume Download Button */}
-          <a
-            href="/resume.pdf"
-            download="Saikat_Gantait_Resume.pdf"
-            className="group"
+          {/* Resume Preview Button */}
+          <Button 
+            onClick={() => setIsResumeOpen(true)}
+            className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 text-white font-semibold px-6 py-3 rounded-full shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all duration-300 group"
           >
-            <Button className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 text-white font-semibold px-6 py-3 rounded-full shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all duration-300">
-              <Download className="w-4 h-4 mr-2 group-hover:animate-bounce" />
-              Download Resume
-            </Button>
-          </a>
+            <FileText className="w-4 h-4 mr-2 group-hover:animate-bounce" />
+            View Resume
+          </Button>
 
           {/* Social Links */}
           <div className="flex items-center gap-3">
@@ -179,7 +180,8 @@ const Hero = () => {
           <ChevronDown className="w-8 h-8 text-cyan-400/50" />
         </motion.div>
       </motion.div>
-    </section>
+      </section>
+    </>
   );
 };
 
