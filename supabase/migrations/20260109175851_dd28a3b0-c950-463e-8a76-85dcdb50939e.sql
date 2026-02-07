@@ -99,11 +99,14 @@ INSERT INTO public.portfolio_tech_stack (category, technologies, display_order) 
 
 -- Insert current timeline data
 INSERT INTO public.portfolio_timeline (year, title, description, icon_name, event_type, display_order) VALUES
-('2024', 'AI Research Intern', 'Working on cutting-edge machine learning projects', 'Briefcase', 'work', 1),
-('2023', 'Hackathon Winner', 'Won first place at National AI Hackathon', 'Award', 'achievement', 2),
-('2023', 'Open Source Contributor', 'Major contributions to ML libraries', 'Code', 'achievement', 3),
-('2022', 'Started B.Tech', 'Computer Science with AI specialization', 'GraduationCap', 'education', 4),
-('2022', 'First ML Project', 'Built sentiment analysis system', 'Rocket', 'achievement', 5);
+('2025', 'Aptos Hackathon Winner', 'Won Aptos blockchain hackathon building decentralized applications on Move', 'Award', 'achievement', 1),
+('2025', 'Algorand Hackathon Winner', 'First place at Algorand hackathon developing smart contract solutions', 'Award', 'achievement', 2),
+('2025', 'Avalanche Hackathon Winner', 'Won Avalanche hackathon creating DeFi protocols and dApps', 'Award', 'achievement', 3),
+('2025', 'Sidetripe Hackathon Winner', 'Champion at Sidetripe hackathon building innovative web3 solutions', 'Award', 'achievement', 4),
+('2024', 'AI Research Intern', 'Working on cutting-edge machine learning projects', 'Briefcase', 'work', 5),
+('2023', 'Open Source Contributor', 'Major contributions to ML libraries', 'Code', 'achievement', 6),
+('2022', 'Started B.Tech', 'Computer Science with AI specialization', 'GraduationCap', 'education', 7),
+('2022', 'First ML Project', 'Built sentiment analysis system', 'Rocket', 'achievement', 8);
 
 -- Insert current projects data
 INSERT INTO public.portfolio_projects (name, description, tech, github, image_url, gradient, display_order) VALUES

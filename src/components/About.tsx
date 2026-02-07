@@ -28,6 +28,81 @@ const iconMap: Record<string, LucideIcon> = {
   Rocket,
 };
 
+const fallbackTimeline: TimelineItem[] = [
+  {
+    id: "2025-aptos",
+    year: "2025",
+    title: "Aptos Hackathon Winner",
+    description: "Won Aptos blockchain hackathon building decentralized applications on Move.",
+    icon_name: "Award",
+    event_type: "achievement",
+    display_order: 1,
+  },
+  {
+    id: "2025-algorand",
+    year: "2025",
+    title: "Algorand Hackathon Winner",
+    description: "First place at Algorand hackathon developing smart contract solutions.",
+    icon_name: "Award",
+    event_type: "achievement",
+    display_order: 2,
+  },
+  {
+    id: "2025-avalanche",
+    year: "2025",
+    title: "Avalanche Hackathon Winner",
+    description: "Won Avalanche hackathon creating DeFi protocols and dApps.",
+    icon_name: "Award",
+    event_type: "achievement",
+    display_order: 3,
+  },
+  {
+    id: "2025-sidetripe",
+    year: "2025",
+    title: "Sidetripe Hackathon Winner",
+    description: "Champion at Sidetripe hackathon building innovative web3 solutions.",
+    icon_name: "Award",
+    event_type: "achievement",
+    display_order: 4,
+  },
+  {
+    id: "2024-intern",
+    year: "2024",
+    title: "AI Research Intern",
+    description: "Working on cutting-edge machine learning projects.",
+    icon_name: "Briefcase",
+    event_type: "work",
+    display_order: 5,
+  },
+  {
+    id: "2023-oss",
+    year: "2023",
+    title: "Open Source Contributor",
+    description: "Major contributions to ML libraries.",
+    icon_name: "Code",
+    event_type: "achievement",
+    display_order: 6,
+  },
+  {
+    id: "2022-btech",
+    year: "2022",
+    title: "Started B.Tech",
+    description: "Computer Science with AI specialization.",
+    icon_name: "GraduationCap",
+    event_type: "education",
+    display_order: 7,
+  },
+  {
+    id: "2022-ml",
+    year: "2022",
+    title: "First ML Project",
+    description: "Built sentiment analysis system.",
+    icon_name: "Rocket",
+    event_type: "achievement",
+    display_order: 8,
+  },
+];
+
 const About = () => {
   const [timeline, setTimeline] = useState<TimelineItem[]>([]);
   const [stats, setStats] = useState<StatItem[]>([]);
@@ -39,9 +114,22 @@ const About = () => {
         supabase.from('portfolio_timeline').select('*').order('display_order'),
         supabase.from('portfolio_stats').select('*').order('display_order').limit(3)
       ]);
-      
-      if (timelineRes.data) setTimeline(timelineRes.data);
-      if (statsRes.data) setStats(statsRes.data);
+
+      if (timelineRes.error) {
+        console.warn('Failed to load timeline, using fallback data.', timelineRes.error);
+      }
+
+      const timelineData = timelineRes.data && timelineRes.data.length > 0
+        ? timelineRes.data
+        : fallbackTimeline;
+
+      setTimeline(timelineData);
+
+      if (statsRes.error) {
+        console.warn('Failed to load stats.', statsRes.error);
+      }
+
+      if (statsRes.data && statsRes.data.length > 0) setStats(statsRes.data);
       setLoading(false);
     };
 
