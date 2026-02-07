@@ -67,20 +67,35 @@ const Contact = () => {
   ];
 
   return (
-    <section className="py-20 px-6" id="contact" aria-label="Contact section">
-      <div className="max-w-4xl mx-auto">
+    <section className="py-24 md:py-32 px-6 relative overflow-hidden" id="contact" aria-label="Contact section">
+      {/* Premium background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-t from-primary/[0.08] via-secondary/[0.04] to-transparent rounded-full blur-[100px]" />
+      </div>
+
+      <div className="max-w-4xl mx-auto relative">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: [0.25, 0.4, 0.25, 1] }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-green-400 to-primary bg-clip-text text-transparent">
+          <motion.span 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="inline-block px-5 py-2 rounded-full bg-emerald-500/5 border border-emerald-500/20 text-emerald-400 text-[11px] font-semibold mb-6 tracking-[0.15em] uppercase"
+          >
+            Get in Touch
+          </motion.span>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 tracking-[-0.03em]">
+            <span className="bg-gradient-to-r from-emerald-400 via-primary to-secondary bg-clip-text text-transparent">
               Let's Connect
             </span>
           </h2>
-          <p className="text-muted-foreground max-w-lg mx-auto">
+          <p className="text-muted-foreground max-w-lg mx-auto text-lg leading-relaxed font-light tracking-wide">
             Have a project in mind? Let's build something amazing together.
           </p>
         </motion.div>
@@ -88,19 +103,20 @@ const Contact = () => {
         <div className="grid md:grid-cols-2 gap-8">
           {/* Contact Info */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
+            initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: [0.25, 0.4, 0.25, 1] }}
             className="space-y-6"
           >
-            <div className="p-6 rounded-2xl bg-white/5 border border-border">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-primary to-secondary">
-                  <MapPin className="w-6 h-6 text-primary-foreground" aria-hidden="true" />
+            <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.1] transition-all duration-500">
+              <div className="flex items-center gap-4 mb-5">
+                <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/20">
+                  <MapPin className="w-6 h-6 text-primary" aria-hidden="true" />
                 </div>
                 <div>
-                  <h3 className="text-foreground font-semibold">Location</h3>
-                  <p className="text-muted-foreground">Kolkata, India</p>
+                  <h3 className="text-foreground font-semibold tracking-wide">Location</h3>
+                  <p className="text-muted-foreground text-[14px] font-light">Kolkata, India</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -108,14 +124,14 @@ const Contact = () => {
                   <Mail className="w-6 h-6 text-primary-foreground" aria-hidden="true" />
                 </div>
                 <div>
-                  <h3 className="text-foreground font-semibold">Email</h3>
-                  <p className="text-muted-foreground">Available via social links</p>
+                  <h3 className="text-foreground font-semibold tracking-wide">Email</h3>
+                  <p className="text-muted-foreground text-[14px] font-light">Available via social links</p>
                 </div>
               </div>
             </div>
 
             <div className="p-6 rounded-2xl bg-white/5 border border-border">
-              <h3 className="text-foreground font-semibold mb-4">Connect with me</h3>
+              <h3 className="text-foreground font-semibold tracking-wide mb-4">Connect with me</h3>
               <nav aria-label="Social media links">
                 <div className="flex gap-4">
                   {socialLinks.map((social) => (

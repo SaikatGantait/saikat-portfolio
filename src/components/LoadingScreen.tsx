@@ -62,6 +62,8 @@ const LoadingScreen = ({ onLoadingComplete }: LoadingScreenProps) => {
           aria-valuemax={100}
           aria-label="Loading portfolio"
         >
+          <div className="absolute inset-0 loading-grid" aria-hidden="true" />
+          <div className="absolute inset-0 loading-glow" aria-hidden="true" />
           <div className="relative cursor-pointer" title="Click or press any key to skip">
             {/* Animated rings */}
             <motion.div
@@ -73,7 +75,7 @@ const LoadingScreen = ({ onLoadingComplete }: LoadingScreenProps) => {
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                className="w-32 h-32 rounded-full border-2 border-primary/30"
+                className="w-32 h-32 rounded-full border-2 border-primary/30 shadow-[0_0_40px_-18px_rgba(59,130,246,0.8)]"
               />
             </motion.div>
             
@@ -86,7 +88,7 @@ const LoadingScreen = ({ onLoadingComplete }: LoadingScreenProps) => {
               <motion.div
                 animate={{ rotate: -360 }}
                 transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                className="w-40 h-40 rounded-full border-2 border-secondary/30"
+                className="w-40 h-40 rounded-full border-2 border-secondary/30 shadow-[0_0_50px_-24px_rgba(168,85,247,0.8)]"
               />
             </motion.div>
 
@@ -101,7 +103,7 @@ const LoadingScreen = ({ onLoadingComplete }: LoadingScreenProps) => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.25 }}
-                className="text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+                className="text-5xl font-extrabold tracking-[-0.05em] gradient-text-animated"
               >
                 SG
               </motion.span>
@@ -112,19 +114,23 @@ const LoadingScreen = ({ onLoadingComplete }: LoadingScreenProps) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-32"
+              className="absolute -bottom-16 left-1/2 -translate-x-1/2 w-36"
             >
-              <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+              <div className="h-[2px] bg-white/[0.05] rounded-full overflow-hidden">
                 <motion.div
                   style={{ width: `${progress}%` }}
-                  className="h-full bg-gradient-to-r from-primary to-secondary rounded-full transition-all duration-100"
+                  className="h-full bg-gradient-to-r from-primary via-purple-400 to-secondary rounded-full transition-all duration-100"
                 />
               </div>
-              <p className="text-muted-foreground text-xs text-center mt-2 font-mono">
-                {Math.round(progress)}%
+              <div className="mt-3 flex items-center justify-between text-[10px] text-muted-foreground/70 font-medium tracking-[0.2em]">
+                <span>LOADING</span>
+                <span>{Math.round(progress)}%</span>
+              </div>
+              <p className="text-muted-foreground/70 text-[11px] text-center mt-3 font-medium tracking-wide">
+                Loading<span className="animate-pulse">...</span>
               </p>
-              <p className="text-muted-foreground/50 text-[10px] text-center mt-1">
-                Click or press any key to skip
+              <p className="text-muted-foreground/30 text-[10px] text-center mt-1 tracking-wider">
+                Press any key to skip
               </p>
             </motion.div>
           </div>

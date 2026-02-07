@@ -46,7 +46,7 @@ const Counter = ({ value, suffix }: { value: number; suffix: string }) => {
   }, [isInView, value]);
 
   return (
-    <span ref={ref} className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+    <span ref={ref} className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.03em] bg-gradient-to-br from-foreground via-primary to-secondary bg-clip-text text-transparent">
       {count}{suffix}
     </span>
   );
@@ -96,19 +96,19 @@ const Stats = () => {
 
   if (loading) {
     return (
-      <section className="py-20 px-4" aria-label="Statistics loading">
+      <section className="py-24 md:py-32 px-6" aria-label="Statistics loading">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((i) => (
               <div 
                 key={i} 
-                className="flex flex-col items-center p-6 rounded-2xl bg-card backdrop-blur-sm border border-border animate-pulse"
+                className="flex flex-col items-center p-8 rounded-2xl bg-white/[0.02] backdrop-blur-sm border border-white/[0.05] animate-pulse"
                 role="status"
                 aria-label="Loading statistic"
               >
-                <div className="w-8 h-8 bg-muted rounded-full mb-4" />
-                <div className="w-16 h-10 bg-muted rounded mb-2" />
-                <div className="w-20 h-4 bg-muted rounded" />
+                <div className="w-12 h-12 bg-white/[0.05] rounded-xl mb-6" />
+                <div className="w-20 h-12 bg-white/[0.05] rounded mb-3" />
+                <div className="w-24 h-4 bg-white/[0.05] rounded" />
               </div>
             ))}
           </div>
@@ -118,20 +118,23 @@ const Stats = () => {
   }
 
   return (
-    <section className="py-20 px-4" aria-label="Statistics">
-      <div className="max-w-6xl mx-auto">
+    <section className="py-24 md:py-32 px-6 relative" aria-label="Statistics">
+      {/* Subtle gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/[0.02] to-transparent pointer-events-none" />
+      
+      <div className="max-w-6xl mx-auto relative">
         {error && (
-          <div className="flex items-center justify-center gap-2 mb-4 text-muted-foreground text-sm">
+          <div className="flex items-center justify-center gap-2 mb-6 text-muted-foreground text-sm">
             <AlertTriangle className="w-4 h-4" aria-hidden="true" />
             <span>Showing cached data</span>
           </div>
         )}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.8, ease: [0.25, 0.4, 0.25, 1] }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-8"
+          className="grid grid-cols-2 md:grid-cols-4 gap-6"
           role="list"
           aria-label="Portfolio statistics"
         >
@@ -140,16 +143,21 @@ const Stats = () => {
             return (
               <motion.div
                 key={stat.id}
-                initial={{ opacity: 0, scale: 0.5 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1, ease: [0.25, 0.4, 0.25, 1] }}
                 viewport={{ once: true }}
-                className="flex flex-col items-center p-6 rounded-2xl bg-card backdrop-blur-sm border border-border hover:border-primary/50 transition-all duration-300"
+                className="group relative flex flex-col items-center p-8 rounded-2xl bg-white/[0.02] backdrop-blur-sm border border-white/[0.05] hover:border-primary/20 transition-all duration-500 hover:bg-white/[0.04]"
                 role="listitem"
               >
-                <IconComponent className="w-8 h-8 text-primary mb-4" aria-hidden="true" />
+                {/* Glow effect on hover */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                
+                <div className="relative p-3 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 mb-6 group-hover:scale-110 transition-transform duration-500">
+                  <IconComponent className="w-6 h-6 text-primary" aria-hidden="true" />
+                </div>
                 <Counter value={stat.value} suffix={stat.suffix} />
-                <span className="text-muted-foreground text-sm mt-2 text-center">{stat.label}</span>
+                <span className="text-muted-foreground text-[13px] mt-3 text-center font-medium tracking-wide uppercase">{stat.label}</span>
               </motion.div>
             );
           })}
