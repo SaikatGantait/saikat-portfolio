@@ -52,9 +52,11 @@ const Navbar = () => {
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-background/80 backdrop-blur-lg border-b border-border" : ""
+      transition={{ duration: 0.8, ease: [0.25, 0.4, 0.25, 1] }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        isScrolled 
+          ? "bg-background/60 backdrop-blur-2xl border-b border-white/[0.05] shadow-lg shadow-black/10" 
+          : "bg-transparent"
       }`}
       role="navigation"
       aria-label="Main navigation"
@@ -63,38 +65,39 @@ const Navbar = () => {
         <div className="flex items-center justify-between">
           <a 
             href="#" 
-            className="text-xl font-bold"
+            className="text-2xl font-extrabold tracking-[-0.03em] relative group"
             aria-label="Saikat Gantait - Home"
           >
-            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary via-purple-400 to-secondary bg-clip-text text-transparent">
               SG
             </span>
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300" />
           </a>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-1">
             {navItems.map((item) => (
               <a
                 key={item.label}
                 href={item.href}
-                className="text-muted-foreground hover:text-foreground transition-colors relative group"
+                className="px-4 py-2 text-[13px] font-medium tracking-wide text-muted-foreground hover:text-foreground transition-all duration-300 relative group rounded-full hover:bg-white/[0.03]"
               >
                 {item.label}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300" />
+                <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary scale-0 group-hover:scale-100 transition-transform duration-300" />
               </a>
             ))}
             
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-full bg-white/5 border border-border hover:bg-white/10 transition-all duration-300"
+              className="ml-4 p-2.5 rounded-full bg-white/[0.03] border border-white/10 hover:bg-white/[0.08] hover:border-white/20 transition-all duration-300"
               aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
               title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
             >
               {theme === "dark" ? (
-                <Sun className="w-5 h-5 text-yellow-400" aria-hidden="true" />
+                <Sun className="w-4 h-4 text-yellow-400" aria-hidden="true" />
               ) : (
-                <Moon className="w-5 h-5 text-secondary" aria-hidden="true" />
+                <Moon className="w-4 h-4 text-secondary" aria-hidden="true" />
               )}
             </button>
           </div>
