@@ -7,11 +7,12 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Home, User, Briefcase, Code, BookOpen, MessageSquare, Mail } from "lucide-react";
+import { Home, User, Briefcase, Code, BookOpen, MessageSquare, Mail, Trophy } from "lucide-react";
 
 const commands = [
   { label: "Home", href: "#", icon: Home, group: "Navigation" },
   { label: "About", href: "#about", icon: User, group: "Navigation" },
+  { label: "Hackathons", href: "#hackathons", icon: Trophy, group: "Navigation" },
   { label: "Projects", href: "#projects", icon: Briefcase, group: "Navigation" },
   { label: "Skills", href: "#skills", icon: Code, group: "Navigation" },
   { label: "Blog", href: "#blog", icon: BookOpen, group: "Navigation" },
