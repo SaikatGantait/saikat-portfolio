@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
 import Stats from "@/components/Stats";
+import Hackathons from "@/components/Hackathons";
 import Projects from "@/components/Projects";
 import Skills from "@/components/Skills";
 import GitHubActivity from "@/components/GitHubActivity";
@@ -70,6 +71,9 @@ const Index = () => {
             </ErrorBoundary>
             <ErrorBoundary>
               <Stats />
+            </ErrorBoundary>
+            <ErrorBoundary>
+              <Hackathons />
             </ErrorBoundary>
             <ErrorBoundary>
               <Projects />
