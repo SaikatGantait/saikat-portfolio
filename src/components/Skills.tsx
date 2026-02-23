@@ -1,7 +1,5 @@
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { AlertTriangle } from "lucide-react";
+import { useState } from "react";
 
 interface Skill {
   id: string;
@@ -46,50 +44,9 @@ const getTechBentoClass = (index: number) => {
 };
 
 const Skills = () => {
-  const [skills, setSkills] = useState<Skill[]>([]);
-  const [techStack, setTechStack] = useState<TechStack[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [skillsRes, techRes] = await Promise.all([
-          supabase.from('portfolio_skills').select('*').order('display_order'),
-          supabase.from('portfolio_tech_stack').select('*').order('display_order')
-        ]);
-        
-        if (skillsRes.error) {
-          console.error("Error fetching skills:", skillsRes.error);
-          setSkills(fallbackSkills);
-          setError("Failed to load skills");
-        } else if (skillsRes.data && skillsRes.data.length > 0) {
-          setSkills(skillsRes.data);
-        } else {
-          setSkills(fallbackSkills);
-        }
-
-        if (techRes.error) {
-          console.error("Error fetching tech stack:", techRes.error);
-          setTechStack(fallbackTechStack);
-          setError("Failed to load tech stack");
-        } else if (techRes.data && techRes.data.length > 0) {
-          setTechStack(techRes.data);
-        } else {
-          setTechStack(fallbackTechStack);
-        }
-      } catch (err) {
-        console.error("Error fetching data:", err);
-        setSkills(fallbackSkills);
-        setTechStack(fallbackTechStack);
-        setError("Failed to load data");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+  const [skills] = useState<Skill[]>(fallbackSkills);
+  const [techStack] = useState<TechStack[]>(fallbackTechStack);
+  const [loading] = useState(false);
 
   if (loading) {
     return (
@@ -137,13 +94,6 @@ const Skills = () => {
             My technical arsenal for building modern, scalable applications.
           </p>
         </motion.div>
-
-        {error && (
-          <div className="flex items-center justify-center gap-2 mb-8 text-muted-foreground text-sm">
-            <AlertTriangle className="w-4 h-4" aria-hidden="true" />
-            <span>Showing cached data</span>
-          </div>
-        )}
 
         <div className="grid lg:grid-cols-2 gap-16">
           {/* Skill Bars */}

@@ -1,8 +1,7 @@
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ChevronLeft, ChevronRight, Quote, Star, Send, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 interface FeedbackItem {
@@ -13,9 +12,33 @@ interface FeedbackItem {
   created_at: string;
 }
 
+const fallbackFeedbacks: FeedbackItem[] = [
+  {
+    id: "feedback-1",
+    name: "Aarav Sen",
+    message: "Saikat delivers polished UI and clean code. A reliable developer to collaborate with.",
+    rating: 5,
+    created_at: "2025-11-12T10:00:00.000Z",
+  },
+  {
+    id: "feedback-2",
+    name: "Ishita Roy",
+    message: "Great communication and strong problem-solving skills. Highly recommended.",
+    rating: 5,
+    created_at: "2025-08-04T14:30:00.000Z",
+  },
+  {
+    id: "feedback-3",
+    name: "Rahul Das",
+    message: "Fast turnaround with impressive attention to detail. Loved the final output.",
+    rating: 4,
+    created_at: "2025-05-19T09:15:00.000Z",
+  },
+];
+
 const Testimonials = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([]);
+  const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>(fallbackFeedbacks);
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
   const [rating, setRating] = useState(5);
@@ -23,46 +46,7 @@ const Testimonials = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  // Fetch existing feedbacks
-  useEffect(() => {
-    const fetchFeedbacks = async () => {
-      const { data, error } = await supabase
-        .from("feedback")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(10);
-
-      if (error) {
-        console.error("Error fetching feedback:", error);
-      } else {
-        setFeedbacks(data || []);
-      }
-    };
-
-    fetchFeedbacks();
-
-    // Subscribe to realtime updates
-    const channel = supabase
-      .channel("feedback-changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "feedback",
-        },
-        (payload) => {
-          setFeedbacks((prev) => [payload.new as FeedbackItem, ...prev].slice(0, 10));
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!name.trim() || !message.trim()) {
@@ -76,29 +60,23 @@ const Testimonials = () => {
 
     setIsSubmitting(true);
 
-    const { error } = await supabase.from("feedback").insert({
+    const newFeedback: FeedbackItem = {
+      id: `feedback-${Date.now()}`,
       name: name.trim(),
       message: message.trim(),
       rating,
+      created_at: new Date().toISOString(),
+    };
+
+    setFeedbacks((prev) => [newFeedback, ...prev].slice(0, 10));
+    setCurrentIndex(0);
+    toast({
+      title: "Thank you!",
+      description: "Your feedback has been added locally.",
     });
-
-    if (error) {
-      console.error("Error submitting feedback:", error);
-      toast({
-        title: "Error",
-        description: "Failed to submit feedback. Please try again.",
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Thank you!",
-        description: "Your feedback has been submitted successfully.",
-      });
-      setName("");
-      setMessage("");
-      setRating(5);
-    }
-
+    setName("");
+    setMessage("");
+    setRating(5);
     setIsSubmitting(false);
   };
 

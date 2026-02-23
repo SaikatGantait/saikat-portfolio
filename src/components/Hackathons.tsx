@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
-import { Trophy, Award, Calendar, ExternalLink, Code2, Zap } from "lucide-react";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { Trophy, Award, Calendar, Zap } from "lucide-react";
+import { useState } from "react";
 
 interface HackathonItem {
   id: string;
@@ -43,36 +42,8 @@ const fallbackHackathons: HackathonItem[] = [
 ];
 
 const Hackathons = () => {
-  const [hackathons, setHackathons] = useState<HackathonItem[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchHackathons = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('portfolio_timeline')
-          .select('*')
-          .eq('event_type', 'achievement')
-          .order('display_order');
-
-        if (error) {
-          console.error("Error fetching hackathons:", error);
-          setHackathons(fallbackHackathons);
-        } else if (data && data.length > 0) {
-          setHackathons(data);
-        } else {
-          setHackathons(fallbackHackathons);
-        }
-      } catch (err) {
-        console.error("Error:", err);
-        setHackathons(fallbackHackathons);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchHackathons();
-  }, []);
+  const [hackathons] = useState<HackathonItem[]>(fallbackHackathons);
+  const [loading] = useState(false);
 
   return (
     <section

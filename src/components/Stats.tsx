@@ -1,7 +1,6 @@
 import { motion, useInView } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
-import { Briefcase, Code, Rocket, Award, LucideIcon, AlertTriangle } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { Briefcase, Code, Rocket, Award, LucideIcon } from "lucide-react";
 
 interface Stat {
   id: string;
@@ -57,42 +56,12 @@ const fallbackStats: Stat[] = [
   { id: "1", label: "Years Experience", value: 2, suffix: "+", icon_name: "Briefcase", display_order: 1 },
   { id: "2", label: "Projects Completed", value: 15, suffix: "+", icon_name: "Code", display_order: 2 },
   { id: "3", label: "Technologies", value: 10, suffix: "+", icon_name: "Rocket", display_order: 3 },
-  { id: "4", label: "Hackathons Won", value: 3, suffix: "", icon_name: "Award", display_order: 4 },
+  { id: "4", label: "Hackathons Won", value: 4, suffix: "", icon_name: "Award", display_order: 4 },
 ];
 
 const Stats = () => {
-  const [stats, setStats] = useState<Stat[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('portfolio_stats')
-          .select('*')
-          .order('display_order');
-        
-        if (error) {
-          console.error("Error fetching stats:", error);
-          setError("Failed to load stats");
-          setStats(fallbackStats);
-        } else if (data && data.length > 0) {
-          setStats(data);
-        } else {
-          setStats(fallbackStats);
-        }
-      } catch (err) {
-        console.error("Error fetching stats:", err);
-        setError("Failed to load stats");
-        setStats(fallbackStats);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStats();
-  }, []);
+  const [stats] = useState<Stat[]>(fallbackStats);
+  const [loading] = useState(false);
 
   if (loading) {
     return (
@@ -123,12 +92,6 @@ const Stats = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/[0.02] to-transparent pointer-events-none" />
       
       <div className="max-w-6xl mx-auto relative">
-        {error && (
-          <div className="flex items-center justify-center gap-2 mb-6 text-muted-foreground text-sm">
-            <AlertTriangle className="w-4 h-4" aria-hidden="true" />
-            <span>Showing cached data</span>
-          </div>
-        )}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}

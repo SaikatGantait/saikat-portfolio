@@ -13,6 +13,5 @@ Features:
 - React 18 + TypeScript
 - Tailwind CSS
 - React Three Fiber (3D scene)
-- Supabase integration
 
 For deployment, ensure your hosting supports SPA fallback for client-side routing.

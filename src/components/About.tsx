@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { GraduationCap, Briefcase, Code, Award, Rocket, LucideIcon } from "lucide-react";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 
 interface TimelineItem {
   id: string;
@@ -58,39 +57,17 @@ const fallbackTimeline: TimelineItem[] = [
   },
 ];
 
+const fallbackStats: StatItem[] = [
+  { id: "1", label: "Years Experience", value: 2, suffix: "+" },
+  { id: "2", label: "Projects Completed", value: 15, suffix: "+" },
+  { id: "3", label: "Hackathons Won", value: 4, suffix: "" },
+];
+
 const About = () => {
-  const [timeline, setTimeline] = useState<TimelineItem[]>([]);
-  const [stats, setStats] = useState<StatItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [timeline] = useState<TimelineItem[]>(fallbackTimeline);
+  const [stats] = useState<StatItem[]>(fallbackStats);
+  const [loading] = useState(false);
   const [activeTimeline, setActiveTimeline] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const [timelineRes, statsRes] = await Promise.all([
-        supabase.from('portfolio_timeline').select('*').neq('event_type', 'achievement').order('display_order'),
-        supabase.from('portfolio_stats').select('*').order('display_order').limit(3)
-      ]);
-
-      if (timelineRes.error) {
-        console.warn('Failed to load timeline, using fallback data.', timelineRes.error);
-      }
-
-      const timelineData = timelineRes.data && timelineRes.data.length > 0
-        ? timelineRes.data
-        : fallbackTimeline;
-
-      setTimeline(timelineData);
-
-      if (statsRes.error) {
-        console.warn('Failed to load stats.', statsRes.error);
-      }
-
-      if (statsRes.data && statsRes.data.length > 0) setStats(statsRes.data);
-      setLoading(false);
-    };
-
-    fetchData();
-  }, []);
 
   return (
     <section className="py-24 md:py-32 px-6 relative overflow-hidden" id="about">

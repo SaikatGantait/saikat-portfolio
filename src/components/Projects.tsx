@@ -1,7 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { ExternalLink, Github } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useRef } from "react";
 
 // Import local images for fallback
 import projectMindweaver from "@/assets/project-mindweaver.png";
@@ -60,6 +59,81 @@ const getBentoClass = (index: number) => {
 
   return patterns[index % patterns.length];
 };
+
+const fallbackProjects: Project[] = [
+  {
+    id: "project-mindweaver",
+    name: "Mindweaver AI",
+    description: "An AI-powered research assistant for summarizing papers and generating insights.",
+    tech: ["React", "TypeScript", "Tailwind", "AI"],
+    github: null,
+    live_url: null,
+    image_url: "project-mindweaver",
+    gradient: "from-purple-500/20 to-cyan-500/20",
+    display_order: 1,
+    is_featured: true,
+  },
+  {
+    id: "project-sora",
+    name: "Sora Studio",
+    description: "A creative studio landing site with bold visuals and smooth motion design.",
+    tech: ["Vite", "React", "Framer Motion"],
+    github: null,
+    live_url: null,
+    image_url: "project-sora",
+    gradient: "from-blue-500/20 to-violet-500/20",
+    display_order: 2,
+    is_featured: true,
+  },
+  {
+    id: "project-uptime",
+    name: "Uptime Radar",
+    description: "Monitoring dashboard with real-time status indicators and alerting UX.",
+    tech: ["React", "Charts", "TypeScript"],
+    github: null,
+    live_url: null,
+    image_url: "project-uptime",
+    gradient: "from-emerald-500/20 to-cyan-500/20",
+    display_order: 3,
+    is_featured: true,
+  },
+  {
+    id: "project-pokemon",
+    name: "Pokédex Explorer",
+    description: "Interactive Pokédex with search, filters, and animated stats cards.",
+    tech: ["React", "API", "Tailwind"],
+    github: null,
+    live_url: null,
+    image_url: "project-pokemon",
+    gradient: "from-yellow-500/20 to-orange-500/20",
+    display_order: 4,
+    is_featured: true,
+  },
+  {
+    id: "project-sentimatic",
+    name: "Sentimatic",
+    description: "Sentiment analysis dashboard with clean data visualization and insights.",
+    tech: ["ML", "Python", "Dashboard"],
+    github: null,
+    live_url: null,
+    image_url: "project-sentimatic",
+    gradient: "from-pink-500/20 to-purple-500/20",
+    display_order: 5,
+    is_featured: true,
+  },
+  {
+    id: "project-algoverse",
+    name: "Algoverse",
+    description: "A learning platform for algorithms with visual explanations and practice.",
+    tech: ["Next.js", "TypeScript", "Tailwind"],
+    github: null,
+    live_url: null,
+    image_url: "project-algoverse",
+    gradient: "from-cyan-500/20 to-blue-500/20",
+    display_order: 6,
+    is_featured: true,
+  },
+];
 
 const ProjectCard = ({ project, index }: { project: Project; index: number }) => {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -176,26 +250,9 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
 };
 
 const Projects = () => {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [projects] = useState<Project[]>(fallbackProjects);
+  const [loading] = useState(false);
   const [activeFilter, setActiveFilter] = useState("All");
-
-  useEffect(() => {
-    const fetchProjects = async () => {
-      const { data, error } = await supabase
-        .from('portfolio_projects')
-        .select('*')
-        .eq('is_featured', true)
-        .order('display_order');
-      
-      if (!error && data) {
-        setProjects(data);
-      }
-      setLoading(false);
-    };
-
-    fetchProjects();
-  }, []);
 
   const allTechs = ["All", ...new Set(projects.flatMap((p) => p.tech))];
 
